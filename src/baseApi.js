@@ -58,8 +58,7 @@ export const createRequest = R.curry((opts) => {
             return reject('服务器异常，请刷新重试');
           }
           const status = R.defaultTo(200, R.path(['error', 'code'], data));
-          const errorMsg = R.defaultTo('', R.path(['error', 'message'], data));
-          if (status !== 200) { return reject(errorMsg); }
+          if (status !== 200) { return reject(R.path(['error'], data)); }
           return resolve(data);
         });
       })
