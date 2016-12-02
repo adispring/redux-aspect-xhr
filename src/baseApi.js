@@ -84,3 +84,5 @@ export const createRequest = R.curry((opts) => {
   });
 });
 
+export default createRequest;
+
