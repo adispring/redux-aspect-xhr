@@ -12,7 +12,7 @@ let aspect = {
 */
 
 export const createRequest = R.curry((opts) => {
-  let aspect = { ...opts };
+  let aspect = R.clone(opts);
 
   const invoke = (dispatch, type, ...args) => {
     if (R.is(Object, aspect[type])) {
@@ -55,7 +55,7 @@ export const createRequest = R.curry((opts) => {
             JSON.parse
             )(body);
           } catch (ex) {
-            return reject('服务器异常，请刷新重试');
+            return reject({ message: '服务器异常，请刷新重试' });
           }
           const status = R.defaultTo(200, R.path(['error', 'code'], data));
           if (status !== 200) { return reject(R.path(['error'], data)); }
