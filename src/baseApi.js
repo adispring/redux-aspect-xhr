@@ -32,7 +32,9 @@ export const createRequest = R.curry((opts) => {
       new Task((reject, resolve) => {
         const uri = R.equals('GET', method) ? `${path}?${qs.stringify(params)}` : path;
         const bodys = R.equals('GET', method) ? undefined : preprocess(params);
-        const headers = header ? R.merge({ 'Content-Type': 'application/json' }, header) : {};
+        const headers = header
+        ? R.merge({ 'Content-Type': 'application/json;charset=UTF-8' }, header)
+        : {};
         headers['X-Requested-With'] = 'XMLHttpRequest';
 
         if (showLoading && !R.isNil(aspect.requestStart)) {
