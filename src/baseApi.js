@@ -33,10 +33,11 @@ const requestCreator = R.curry((aops) => {
         const { header, method, showLoading } = opts;
         const uri = R.equals('GET', method) ? `${path}?${qs.stringify(params)}` : path;
         const bodys = R.equals('GET', method) ? undefined : JSON.stringify(params);
-        const headers = header
-        ? R.merge({ 'Content-Type': 'application/json;charset=UTF-8' }, header)
-        : {};
-        headers['X-Requested-With'] = 'XMLHttpRequest';
+        const headers = R.compose(
+          R.assoc('X-Requested-With', 'XMLHttpRequest'),
+          R.merge({ 'Content-Type': 'application/json;charset=UTF-8' }),
+          R.defaultTo({})
+        )(header);
 
         if (showLoading && !R.isNil(aspect.requestStart)) {
           invoke(dispatch, 'requestStart');
