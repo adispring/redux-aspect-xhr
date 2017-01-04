@@ -1,7 +1,7 @@
 import xhr from 'xhr';
 import Task from 'data.task';
 import R from 'ramda';
-import qs from 'qs';
+import qs from 'querystring';
 
 /*
 let aspect = {
@@ -52,10 +52,7 @@ export const createRequest = R.curry((opts) => {
           if (err) { return reject(err); }
           let data = {};
           try {
-            data = R.compose(
-            R.defaultTo({}),
-            JSON.parse
-            )(body);
+            data = R.compose(R.defaultTo({}), JSON.parse)(body);
           } catch (ex) {
             return reject({ message: '服务器异常，请刷新重试' });
           }
