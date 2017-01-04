@@ -11,8 +11,8 @@ let aspect = {
 };
 */
 
-export const createRequest = R.curry((opts) => {
-  let aspect = R.clone(opts);
+const requestCreator = R.curry((aops) => {
+  let aspect = R.clone(aops);
 
   const invoke = (dispatch, type, ...args) => {
     if (R.is(Object, aspect[type])) {
@@ -22,20 +22,22 @@ export const createRequest = R.curry((opts) => {
     }
   };
 
-  const configAspect = (opt) => {
-    aspect = R.merge(aspect, opt);
+  const configAspect = (aop) => {
+    aspect = R.merge(aspect, aop);
   };
   // Hindley-Milner 类型签名
-  // :: String -> String -> Object -> Task Error Object
+  // :: Object -> String -> Object -> Task Error Object
   const request =
-    R.curry((preprocess, header, method, showLoading, path, params, dispatch) =>
+    R.curry((opts, path, params, dispatch) =>
       new Task((reject, resolve) => {
+        const { header, method, showLoading } = opts;
         const uri = R.equals('GET', method) ? `${path}?${qs.stringify(params)}` : path;
-        const bodys = R.equals('GET', method) ? undefined : preprocess(params);
-        const headers = header
-        ? R.merge({ 'Content-Type': 'application/json;charset=UTF-8' }, header)
-        : {};
-        headers['X-Requested-With'] = 'XMLHttpRequest';
+        const bodys = R.equals('GET', method) ? undefined : JSON.stringify(params);
+        const headers = R.compose(
+          R.assoc('X-Requested-With', 'XMLHttpRequest'),
+          R.merge({ 'Content-Type': 'application/json;charset=UTF-8' }),
+          R.defaultTo({})
+        )(header);
 
         if (showLoading && !R.isNil(aspect.requestStart)) {
           invoke(dispatch, 'requestStart');
@@ -54,7 +56,7 @@ export const createRequest = R.curry((opts) => {
           try {
             data = R.compose(R.defaultTo({}), JSON.parse)(body);
           } catch (ex) {
-            return reject({ message: '服务器异常，请刷新重试' });
+            return reject(ex);
           }
           const status = R.defaultTo(200, R.path(['error', 'code'], data));
           if (status !== 200) { return reject(R.path(['error'], data)); }
@@ -63,15 +65,15 @@ export const createRequest = R.curry((opts) => {
       })
       .rejectedMap((err) => {
         invoke(dispatch, 'throwError', err);
-        return err;
+        throw err;
       }));
 
   // :: String -> Object -> Task Error Object
-  const getJson = request(JSON.stringify, {}, 'GET', true);
-  const postJson = request(JSON.stringify, {}, 'POST', true);
+  const getJson = request({ header: {}, method: 'GET', showLoading: true });
+  const postJson = request({ header: {}, method: 'POST', showLoading: true });
 
-  const getJsonSilence = request(JSON.stringify, {}, 'GET', false);
-  const postJsonSilence = request(JSON.stringify, {}, 'POST', false);
+  const getJsonSilence = request({ header: {}, method: 'GET', showLoading: false });
+  const postJsonSilence = request({ header: {}, method: 'POST', showLoading: false });
 
   return ({
     request,
@@ -83,5 +85,5 @@ export const createRequest = R.curry((opts) => {
   });
 });
 
-export default createRequest;
+export default requestCreator;
 
