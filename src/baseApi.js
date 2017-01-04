@@ -55,7 +55,7 @@ const requestCreator = R.curry((aops) => {
           try {
             data = R.compose(R.defaultTo({}), JSON.parse)(body);
           } catch (ex) {
-            return reject({ message: '服务器异常，请刷新重试' });
+            return reject(ex);
           }
           const status = R.defaultTo(200, R.path(['error', 'code'], data));
           if (status !== 200) { return reject(R.path(['error'], data)); }
