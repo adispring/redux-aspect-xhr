@@ -46,7 +46,7 @@ const requestCreator = R.curry((aops) => {
           uri,
           method,
           headers,
-          body: bodys,
+          body: bodys
         }, (err, resp, body) => {
           if (showLoading && !R.isNil(aspect.requestEnd)) {
             invoke(dispatch, 'requestEnd');
@@ -81,7 +81,7 @@ const requestCreator = R.curry((aops) => {
     postJson,
     getJsonSilence,
     postJsonSilence,
-    configAspect,
+    configAspect
   });
 });
 
