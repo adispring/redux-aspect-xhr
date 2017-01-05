@@ -4,7 +4,8 @@
     "strict": 0,
     "no-underscore-dangle": ["error", { "allow": ["__"] }],
     "new-cap": ["error", { "capIsNew": false }],
-    "no-confusing-arrow": ["error", { "allowParens": true }]
+    "no-confusing-arrow": ["error", { "allowParens": true }],
+    "comma-dangle": ["error", { "functions": "never" }]
   },
   "parserOptions": {
       "ecmaVersion": 6,
